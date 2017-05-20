@@ -1,0 +1,3 @@
+[submodule "WOtech"]
+	path = WOtech
+	url = https://github.com/WraithOne/WOtech.git
