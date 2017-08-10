@@ -59,7 +59,8 @@ void App::Load(Platform::String^ /* entryPoint */)
 
 	// 3D Renderer
 	m_renderer = ref new WOtech::ForwardRenderer(m_device);
-	
+	m_renderer->Init(Windows::UI::Colors::Red);
+
 	// SpriteBatch
 	m_spriteBatch = ref new WOtech::SpriteBatch(m_device);
 	
