@@ -47,7 +47,8 @@ namespace WOtech_template
 
 		WOtech::GameTimer^		m_gameTimer;
 
-		// Gamestates
+		WOtech::Camera^			m_camera;
+		WOtech::Mesh^			m_cube;
 
 		// ClearColor
 		Windows::UI::Color		m_clearColor;

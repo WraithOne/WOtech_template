@@ -24,8 +24,10 @@ void App::Initialize(CoreApplicationView^ applicationView)
 
 	CoreApplication::Resuming += ref new EventHandler<Platform::Object^>(this, &App::OnResuming);
 
-	ApplicationView::PreferredLaunchWindowingMode = ApplicationViewWindowingMode::FullScreen;// todo
+	//ApplicationView::PreferredLaunchWindowingMode = ApplicationViewWindowingMode::FullScreen;// todo
 	WindowClosed = false;    // initialize to false
+
+	m_clearColor = Windows::UI::Colors::Gray;
 }
 
 void App::SetWindow(CoreWindow^ window)
@@ -59,7 +61,7 @@ void App::Load(Platform::String^ /* entryPoint */)
 
 	// 3D Renderer
 	m_renderer = ref new WOtech::ForwardRenderer(m_device);
-	m_renderer->Init(Windows::UI::Colors::Red);
+	m_renderer->Init(m_clearColor);
 
 	// SpriteBatch
 	m_spriteBatch = ref new WOtech::SpriteBatch(m_device);
@@ -70,6 +72,9 @@ void App::Load(Platform::String^ /* entryPoint */)
 	m_audioEngine = ref new WOtech::AudioEngine();
 	m_audioEngine->Initialize();
 
+	m_camera = ref new WOtech::Camera();
+	
+	m_cube = WOtech::DefaultFactory::CreateCube(1.0f, ref new WOtech::MaterialInstance(WOtech::DefaultFactory::CreateBasicMaterial(m_device)), m_device);
 }
 
 void App::Run()
@@ -87,15 +92,20 @@ void App::Run()
 		{
 			// Dispatch all Window events
 			Window->Dispatcher->ProcessEvents(CoreProcessEventsOption::ProcessAllIfPresent);
-
+			
 			// Render
 			m_renderer->Begin();
 			{
+				m_renderer->Submit(m_cube, m_camera, Windows::Foundation::Numerics::float4x4());
+				
 				m_spriteBatch->BeginDraw();
 				{
 				}
 				m_spriteBatch->EndDraw();
+				
 			}
+			m_renderer->End();
+			 
 			m_renderer->Present();
 		}
 		else
@@ -113,9 +123,13 @@ void App::OnStereoEnabledChanged(DisplayInformation^ /* sender */, Platform::Obj
 {
 }
 
-void App::OnWindowSizeChanged(CoreWindow^ window, WindowSizeChangedEventArgs^  /* args */)
+void App::OnWindowSizeChanged(CoreWindow^ window, WindowSizeChangedEventArgs^ args)
 {
-	WOtech::SystemManager::Instance->OnWindowSizeChanged();
+	auto win = window;
+	auto arg = args;
+	auto winsize = Size(arg->Size.Width, arg->Size.Height);
+	auto windowsize = Size(win->Bounds.Width, win->Bounds.Height);
+	WOtech::SystemManager::Instance->OnWindowSizeChanged(windowsize);
 }
 
 void App::OnWindowClosed(CoreWindow^ /* sender */, CoreWindowEventArgs^ /* args */)
